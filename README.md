@@ -1,7 +1,7 @@
 Arch Installer
 =====================
 
-This project provide a bash script for installing Arch Linux (https://www.archlinux.org/) with MBR/BIOS/BRUB.
+This project provides a bash script for installing Arch Linux (https://www.archlinux.org/) with MBR/BIOS/BRUB.
 
 ## Description
 
@@ -10,6 +10,8 @@ I expected 1st generation of virtual machine, so I set up with MBR/BIOS/BRUB.
 Perhaps, this completely works on other environment (e.g. physical machine or other virtual environment)
 
 ## Usage
+First, boot arch linux instruction shell on your (virtual) machine. Next, run a script provided by this project.
+
 ### Interactive
 
     wget https://raw.githubusercontent.com/knaou/arch-installer/master/arch-installer.sh
