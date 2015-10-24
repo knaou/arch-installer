@@ -1,12 +1,12 @@
 Arch Installer
 =====================
 
-This project provides a bash script for installing Arch Linux (https://www.archlinux.org/) with MBR/BIOS/BRUB.
+This project provides a bash script for installing Arch Linux (https://www.archlinux.org/) with MBR/BIOS/GRUB.
 
 ## Description
 
 I wrote this script to install arch-linux on Hyper-V(Windows 10 pro).
-I expected 1st generation of virtual machine, so I set up with MBR/BIOS/BRUB.
+I expected 1st generation of virtual machine, so I set up with MBR/BIOS/GRUB.
 Perhaps, this completely works on other environment (e.g. physical machine or other virtual environment)
 
 ## Usage
