@@ -11,8 +11,7 @@ BOOT_SIZE=512MB
 SWAP_SIZE=4GB
 ROOT_SIZE=10GB
 
-# for ansible
-INSTALL_PACKAGE=(base intel-ucode grub)
+INSTALL_PACKAGE=(base intel-ucode grub openssh)
 EXTRA_INSTALL_PACKAGE=()
 
 # Network
@@ -30,13 +29,13 @@ DNS='192.168.1.1'
 EOF
 )
 
-KEYMAP=jp106
-LOCALE_CONF=ja_JP.UTF-8
+#KEYMAP=jp106
+LOCALE_CONF=en_US.UTF-8
 LOCALE_GEN=$(cat <<- EOF
 	en_US.UTF-8 UTF-8
-	ja_JP.UTF-8 UTF-8
 	EOF
 )
+# ja_JP.UTF-8 UTF-8
 
 #
 # Define functions
