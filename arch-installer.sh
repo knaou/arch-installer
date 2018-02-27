@@ -52,30 +52,30 @@ function intro() {
 function make_partition() {
 	echo "****** Make partition ******"
 	gdisk <<- EOF
-		$STORAGE
-		n
-		
-		
-		+$BOOT_SIZE
-		EF00
-		n
-		
-		
-		+$SWAP_SIZE
-		8200
-		n
-		
-		
-		+$ROOT_SIZE
-		8300
-		n
-		
-
-		
-		8300
-		w
-		y
-		EOF
+	$STORAGE
+	n
+	
+	
+	+$BOOT_SIZE
+	EF00
+	n
+	
+	
+	+$SWAP_SIZE
+	8200
+	n
+	
+	
+	+$ROOT_SIZE
+	8300
+	n
+	
+	
+	
+	8300
+	w
+	y
+	EOF
 }
 
 function format_disk() {
