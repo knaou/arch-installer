@@ -11,7 +11,7 @@ BOOT_SIZE=512MB
 SWAP_SIZE=4GB
 ROOT_SIZE=10GB
 
-INSTALL_PACKAGE=(base intel-ucode grub openssh)
+INSTALL_PACKAGE=(base intel-ucode grub dosfstools efibootmgr openssh)
 EXTRA_INSTALL_PACKAGE=()
 
 # Network
@@ -45,44 +45,42 @@ function intro() {
 	echo "****** Hello, Arch Installer ******"
 	echo "***********************************"
 	echo "* Install Arch Linux"
-	echo "* With:    BIOS/MBR/GRUB"
+	echo "* With:    BIOS/UEFI/GRUB"
 	echo "* Dev:     $STORAGE"
 }
 
 function make_partition() {
 	echo "****** Make partition ******"
-	fdisk $STORAGE <<- EOF
+	gdisk <<- EOF
+		$STORAGE
 		n
-		p
 		
 		
 		+$BOOT_SIZE
+		EF00
 		n
-		p
 		
 		
 		+$SWAP_SIZE
+		8200
 		n
-		p
 		
 		
 		+$ROOT_SIZE
+		8300
 		n
-		p
 		
+
 		
-		a
-		1
-		t
-		2
-		82
+		8300
 		w
+		y
 		EOF
 }
 
 function format_disk() {
 	echo "****** Format disk ******"
-	yes | mkfs.ext4 ${STORAGE}1
+	yes | mkfs.vfat ${STORAGE}1
 	yes | mkfs.ext4 ${STORAGE}3
 	yes | mkfs.ext4 ${STORAGE}4
 	mkswap ${STORAGE}2
@@ -92,10 +90,10 @@ function format_disk() {
 function mount_disk() {
 	echo "****** mount disk ******"
 	mount ${STORAGE}3 /mnt
-    mkdir /mnt/boot
-    mkdir /mnt/home
-    mount ${STORAGE}1 /mnt/boot
-    mount ${STORAGE}4 /mnt/home
+	mkdir /mnt/boot
+	mkdir /mnt/home
+	mount ${STORAGE}1 /mnt/boot
+	mount ${STORAGE}4 /mnt/home
 }
 
 function install_packages() {
@@ -109,9 +107,9 @@ function install_packages() {
 	sntp -b ntp.nict.jp
 	hwclock -w --utc
 	echo "* Update keys"
-	rm -rf /etc/pacman.d/gnupg/*
-	pacman-key --init
-	pacman-key --populate archlinux
+	#rm -rf /etc/pacman.d/gnupg/*
+	#pacman-key --init
+	#pacman-key --populate archlinux
 	echo "* Install packages"
 	pacstrap /mnt ${INSTALL_PACKAGE[@]} ${EXTRA_INSTALL_PACKAGE[@]} 
 }
@@ -147,8 +145,10 @@ function install_under_chroot() {
 	echo "* Set time zone"
 	arch-chroot $CHROOT ln -s /usr/share/zoneinfo/Asia/Tokyo /etc/localtime
 	echo "* Install grub"
-	arch-chroot $CHROOT grub-install --recheck $STORAGE
+	arch-chroot $CHROOT grub-install --target=x86_64-efi --efi-directory=/boot --bootloader-id=arch_grub --recheck $STORAGE
 	arch-chroot $CHROOT grub-mkconfig -o /boot/grub/grub.cfg
+	mkdir $CHROOT/boot/EFI/boot
+	cp $CHROOT/boot/EFI/arch_grub/grubx64.efi $CHROOT/boot/EFI/boot/bootx64.efi
 	echo "* Set password"
 	arch-chroot $CHROOT passwd root <<- EOF
 		$ROOT_PASSWORD
