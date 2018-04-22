@@ -136,8 +136,8 @@ function create_configs() {
 function install_under_chroot() {
 	CHROOT=/mnt
 	echo "****** Install under chroot ******"
-	echo "* Enable eth0"
-	arch-chroot $CHROOT netctl enable eth0
+	echo "* Enable $NETWORK_INTERFACE"
+	arch-chroot $CHROOT netctl enable $NETWORK_INTERFACE
 	echo "* Enable sshd"
 	arch-chroot $CHROOT systemctl enable sshd.service
 	echo "* Generate locale"
