@@ -29,7 +29,7 @@ DNS='192.168.1.1'
 EOF
 )
 
-#KEYMAP=jp106
+KEYMAP=jp106
 LOCALE_CONF=en_US.UTF-8
 LOCALE_GEN=$(cat <<- EOF
 	en_US.UTF-8 UTF-8
@@ -81,8 +81,8 @@ EOF
 function format_disk() {
 	echo "****** Format disk ******"
 	yes | mkfs.vfat ${STORAGE}1
-	yes | mkfs.ext4 ${STORAGE}3
-	yes | mkfs.ext4 ${STORAGE}4
+	yes | mkfs.xfs ${STORAGE}3
+	yes | mkfs.xfs ${STORAGE}4
 	mkswap ${STORAGE}2
 	swapon ${STORAGE}2
 }
