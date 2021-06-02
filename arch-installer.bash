@@ -8,10 +8,9 @@ ROOT_PASSWORD="password"
 
 STORAGE=/dev/sda
 BOOT_SIZE=512MB
-SWAP_SIZE=4GB
 ROOT_SIZE=10GB
 
-INSTALL_PACKAGE=(base intel-ucode grub dosfstools efibootmgr openssh)
+INSTALL_PACKAGE=(base linux linux-firmware intel-ucode openssh netctl)
 EXTRA_INSTALL_PACKAGE=()
 
 # Network
@@ -61,11 +60,6 @@ EF00
 n
 
 
-+$SWAP_SIZE
-8200
-n
-
-
 +$ROOT_SIZE
 8300
 n
@@ -80,20 +74,18 @@ EOF
 
 function format_disk() {
 	echo "****** Format disk ******"
-	yes | mkfs.vfat ${STORAGE}1
-	yes | mkfs.xfs ${STORAGE}3
-	yes | mkfs.xfs ${STORAGE}4
-	mkswap ${STORAGE}2
-	swapon ${STORAGE}2
+	yes | mkfs.fat -F32 ${STORAGE}1
+	yes | mkfs.ext4 ${STORAGE}2
+	yes | mkfs.ext4 ${STORAGE}3
 }
 
 function mount_disk() {
 	echo "****** mount disk ******"
-	mount ${STORAGE}3 /mnt
+	mount ${STORAGE}2 /mnt
 	mkdir /mnt/boot
 	mkdir /mnt/home
 	mount ${STORAGE}1 /mnt/boot
-	mount ${STORAGE}4 /mnt/home
+	mount ${STORAGE}3 /mnt/home
 }
 
 function install_packages() {
@@ -144,11 +136,12 @@ function install_under_chroot() {
 	arch-chroot $CHROOT locale-gen
 	echo "* Set time zone"
 	arch-chroot $CHROOT ln -s /usr/share/zoneinfo/Asia/Tokyo /etc/localtime
-	echo "* Install grub"
-	arch-chroot $CHROOT grub-install --target=x86_64-efi --efi-directory=/boot --bootloader-id=arch_grub --recheck $STORAGE
-	arch-chroot $CHROOT grub-mkconfig -o /boot/grub/grub.cfg
-	mkdir $CHROOT/boot/EFI/boot
-	cp $CHROOT/boot/EFI/arch_grub/grubx64.efi $CHROOT/boot/EFI/boot/bootx64.efi
+	echo "* Set systemd-boot"
+	arch-chroot $CHROOT bootctl --path=/boot install
+	echo "title   Arch Linux" > $CHROOT/boot/loader/entries/arch.conf
+	echo "linux   /vmlinuz-linux" >> $CHROOT/boot/loader/entries/arch.conf
+	echo "initrd  /initramfs-linux.img" >> $CHROOT/boot/loader/entries/arch.conf
+	echo "options root=PARTUUID=$(blkid -s PARTUUID -o value /dev/sda2) rw" >> $CHROOT/boot/loader/entries/arch.conf
 	echo "* Set password"
 	arch-chroot $CHROOT passwd root <<- EOF
 		$ROOT_PASSWORD
